@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "sheet-elt-dicoding",
+  "private_key_id": "33a3d4a556e9ab50bde0f827297594d83da14561",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDCx5OGUHIDSdRA\nWQX7kDypiHxSuZiZkQ1mx+IZ7Fu3vBtxKbDRB+5CjB60QepMxJr8NocxDYm0+xyK\nPNdfFuDDRAXAd87fCey4OuR3ZxOhsTGY0cK76yob/F7ucjvTqyaveRt+YFCzq3LY\nQa/2BNWl8D47tPT+Q41Hb3qrJTG8fBZbaC0ZJj6tfZe/C9Zyjr2i05dvOPCyLUxg\ndojQ9SeAF4DVbwBKOapjCbeA1zeDvz0vwdgkdj6gN4nMn62qG6VCgmuat6iQh5eP\npNf02ANtALbETy/DCXij7K2RrT2L+ILFo9SbMeSwLJfWtD7wQyicll1RR2qbSK9j\nrI7Pta2/AgMBAAECggEAQEzoO6fk64b85b09x11HWWQwPpL8eH21IeAMmSg44v/b\nQ1FTCL6IfjmJjVJRScSBsY9CtAPXGQLo2g3Zv49q5atYBsDGb0T0e6EdePlzNqar\nS9q7YZPxk8mNgUP+0hKnM7hURjT/j0CjKhcNQrc33I7hzI4hbqrYQePgaA1gTOtK\nbwDshPJg/55wGB+vXd++6G2VYcObIGiAhPIWFKsWMYvrpWPCUXXLYW8Hou2bc7yF\nPQXYZ3CHirP0EbE9Qma+6m9qKw5YQIll4uJJuBeownnxStXoKjTYMwrcqE2TgL1T\nIaWR2NqN3IddHJQOWnbmuTq5vHvhhqNKd641F64i+QKBgQDk/aX2/I/DVlHymTBL\n0H1CfAkGbyH+AaSV8RaB4kRUPzDvj3rMFtEIbvSOt0NTGcjfw/g2mNs0oxm2piTj\nHy46CfLrIhF0j6+qip3iiiypDolOvgA8tzIydYucDXQ/e3c6Nsi4/GMMh0MJeLJx\nYgIzdES347yS0WJPCSnBpiMKVQKBgQDZwOyQ8Nr+YCh9OsfGcM65QlsIqP1Lyhvd\nW/lj3oBrWuhUCRTyyYRJmJx3FbHG70UHZBty7tvh34pwjYPU+LYArWeDF7Kx3nAs\nA3ONRdRqBaRchqGl4k7fwkNlRy/ZG3bQIx91nVwSHYPJmi+huKWv4Chu8qEHcc7K\n6Dwalb6TwwKBgQCAaDP+0hWTxf3h+kD44oq7E27EKuF23Fj8s9qZLtZ+H4lDbMPB\nWjIRdpawyNd57AWWZP/1LbYOSD+NCpG4wq1bYmTTsaD0KfapvV1XwX/VtQ8OFsFv\nSpNddEi7U1gSmRt8i2f3Q6APUHIpB4OYzQrK67H1JEGEWuGzzEGcE5ummQKBgQDX\naUKdH6eEfRuQxtVaOb5HBp2Hs6TflNB76sCLS1E+4m9ysolGpJN5Or+ODqgPZCOl\nbCK7UA+1Iq6RKW2BAYkKooAD7y2XR7Uv1To6Rxoax/oQjh7bO0VLlaGWTxXGcKTY\nweYdM84hHZGBnkYAdelyUw2ss9kYxD0N/S94HSqqgQKBgAzNt4HURTPgRIUq1SIV\nwIs8qpsShDMrecx+bY0qbo6JURd/25glQgEGMPAkFjXVUKkNKHiiYZPTdqaVhkgh\ndi0cIZRwCTGMzsGexWC70QVF4xwUC5lqj5ilzqGJXFGhDhVkzXckmOTf1InCgzB1\nWthKifbxcDMB4H+h7A4RKxvt\n-----END PRIVATE KEY-----\n",
+  "client_email": "google-sheets-api-json@sheet-elt-dicoding.iam.gserviceaccount.com",
+  "client_id": "109526926384384131683",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/google-sheets-api-json%40sheet-elt-dicoding.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
