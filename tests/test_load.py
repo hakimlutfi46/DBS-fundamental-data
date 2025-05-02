@@ -3,73 +3,102 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock, mock_open
 import pandas as pd
-import warnings
-from utils.load import load_to_postgres, load_to_csv, load_to_google_sheets, load
+from sqlalchemy import exc
+from utils.load import (
+    load_to_postgres,
+    load_to_csv,
+    load_to_google_sheets,
+    load
+)
 
-class TestLoad(unittest.TestCase):
-
+class TestLoadFunctions(unittest.TestCase):
     def setUp(self):
-        # Sample DataFrame to test
-        self.df = pd.DataFrame({
-            'Title': ['Product 1', 'Product 2'],
-            'Price': [10.0, 20.0],
-            'Image URL': ['url1', 'url2'],
-            'Rating': [5.0, 4.5],
-            'Colors': ['Red', 'Blue'],
-            'Size': ['M', 'L'],
-            'Gender': ['Male', 'Female'],
-            'Timestamp': pd.to_datetime(['2023-05-02', '2023-05-02'])
+        self.sample_df = pd.DataFrame({
+            'id': [1, 2],
+            'name': ['A', 'B'],
+            'date': pd.to_datetime(['2023-01-01', '2023-01-02'])
         })
-        self.db_url = "postgresql://user:password@localhost/dbname"
-        self.csv_file_path = "test_data.csv"
-        self.spreadsheet_name = "TestSpreadsheet"
+        self.empty_df = pd.DataFrame()
+        self.db_url = "postgresql://user:pass@localhost/db"
+        self.csv_path = "test.csv"
+        self.sheet_id = "test_sheet_id"
+
+    # Test load_to_postgres
+    @patch('utils.load.create_engine')
+    def test_load_to_postgres_success(self, mock_engine):
+        mock_conn = MagicMock()
+        mock_engine.return_value.begin.return_value.__enter__.return_value = mock_conn
+        self.assertTrue(load_to_postgres(self.sample_df, self.db_url))
 
     @patch('utils.load.create_engine')
-    def test_load_to_postgres(self, mock_create_engine):
-        mock_engine = mock_create_engine.return_value
-        # Mock method to_sql
-        mock_conn = mock_engine.connect.return_value
-        result = load_to_postgres(self.df, self.db_url)
-        self.assertTrue(result)
-            
+    def test_load_to_postgres_db_error(self, mock_engine):
+        mock_engine.return_value.begin.side_effect = exc.SQLAlchemyError("DB error")
+        self.assertFalse(load_to_postgres(self.sample_df, self.db_url))
+
+    def test_load_to_postgres_empty_df(self):
+        self.assertFalse(load_to_postgres(self.empty_df, self.db_url))
+
+    # Test load_to_csv
+    @patch('builtins.open', new_callable=mock_open)
     @patch('pandas.DataFrame.to_csv')
-    def test_load_to_csv(self, mock_to_csv):
-        mock_to_csv.return_value = None
-        result = load_to_csv(self.df, self.csv_file_path)
-        self.assertTrue(result)
-        mock_to_csv.assert_called_once()
+    def test_load_to_csv_success(self, mock_to_csv, mock_file):
+        self.assertTrue(load_to_csv(self.sample_df, self.csv_path))
+
+    @patch('pandas.DataFrame.to_csv', side_effect=PermissionError("No write permission"))
+    def test_load_to_csv_io_error(self, mock_to_csv):
+        self.assertFalse(load_to_csv(self.sample_df, self.csv_path))
+
+    def test_load_to_csv_empty_df(self):
+        self.assertFalse(load_to_csv(self.empty_df, self.csv_path))
+
+    # Test load_to_google_sheets
+    @patch('utils.load.gspread.authorize')
+    @patch('utils.load.ServiceAccountCredentials.from_json_keyfile_name')
+    def test_load_to_google_sheets_success(self, mock_creds, mock_auth):
+        mock_client = MagicMock()
+        mock_auth.return_value = mock_client
+        mock_sheet = MagicMock()
+        mock_client.open_by_key.return_value.get_worksheet.return_value = mock_sheet
+        self.assertTrue(load_to_google_sheets(self.sample_df, self.sheet_id))
+
+    @patch('utils.load.ServiceAccountCredentials.from_json_keyfile_name', 
+           side_effect=FileNotFoundError("No creds file"))
+    def test_load_to_google_sheets_cred_error(self, mock_creds):
+        self.assertFalse(load_to_google_sheets(self.sample_df, self.sheet_id))
 
     @patch('utils.load.gspread.authorize')
     @patch('utils.load.ServiceAccountCredentials.from_json_keyfile_name')
-    def test_load_to_google_sheets(self, mock_creds, mock_authorize):
-        mock_client = mock_authorize.return_value
-        mock_sheet = mock_client.open_by_key.return_value.get_worksheet.return_value
+    def test_load_to_google_sheets_api_error(self, mock_creds, mock_auth):
+        mock_auth.return_value.open_by_key.side_effect = Exception("API error")
+        self.assertFalse(load_to_google_sheets(self.sample_df, self.sheet_id))
 
-        mock_sheet.clear.return_value = None
-        mock_sheet.append_rows.return_value = None
+    def test_load_to_google_sheets_empty_df(self):
+        self.assertFalse(load_to_google_sheets(self.empty_df, self.sheet_id))
 
-        result = load_to_google_sheets(self.df, self.spreadsheet_name)
-        self.assertTrue(result)
+    # Test load function
+    @patch('utils.load.load_to_postgres', return_value=True)
+    @patch('utils.load.load_to_csv', return_value=True)
+    @patch('utils.load.load_to_google_sheets', return_value=True)
+    def test_load_success(self, mock_gsheets, mock_csv, mock_pg):
+        result = load(self.sample_df, self.db_url, self.csv_path, self.sheet_id)
+        self.assertTrue(all(result.values()))
 
-    @patch('utils.load.load_to_postgres')
-    @patch('utils.load.load_to_csv')
-    @patch('utils.load.load_to_google_sheets')
-    def test_load(self, mock_google_sheets, mock_csv, mock_postgres):
-        mock_postgres.return_value = True
-        mock_csv.return_value = True
-        mock_google_sheets.return_value = True
+    @patch('utils.load.load_to_postgres', return_value=False)
+    @patch('utils.load.load_to_csv', return_value=True)
+    @patch('utils.load.load_to_google_sheets', return_value=False)
+    def test_load_partial_failure(self, mock_gsheets, mock_csv, mock_pg):
+        result = load(self.sample_df, self.db_url, self.csv_path, self.sheet_id)
+        self.assertEqual(result, {
+            "postgres": False,
+            "csv": True,
+            "google_sheets": False
+        })
 
-        result = load(self.df, self.db_url, self.csv_file_path, self.spreadsheet_name)
-
-        self.assertTrue(result['postgres'])
-        self.assertTrue(result['csv'])
-        self.assertTrue(result['google_sheets'])
-
-        mock_postgres.assert_called_once()
-        mock_csv.assert_called_once()
-        mock_google_sheets.assert_called_once()
+    def test_load_invalid_input(self):
+        result = load("not a dataframe", self.db_url, self.csv_path, self.sheet_id)
+        self.assertFalse(any(result.values()))
 
 if __name__ == '__main__':
     unittest.main()

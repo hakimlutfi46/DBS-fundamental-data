@@ -17,8 +17,8 @@ def main():
             df=df_cleaned,
             db_url="postgresql://developer:12345@localhost:5432/fashiondb",  
             csv_file_path="products.csv",
-            spreadsheet_name="FashionStudioData"
-        )
+            spreadsheet_id="1pvsfeNJHMKS-xevuULc2wOAhUICzBNt6hRGG7BlMdZE"
+        )              
                 
         success_count = sum(result.values())
         total_count = len(result)
